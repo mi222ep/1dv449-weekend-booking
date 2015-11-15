@@ -1,6 +1,6 @@
 <?php
 $url = "localhost:8080";
-$dinnerURL = "";
+$calendarURL = "";
 $cinemaURL ="";
 $restaurantURL ="";
 
@@ -9,6 +9,10 @@ $curl_scraped_page = findURLs($curl_scraped_page);
 foreach($curl_scraped_page as $page){
     $newpage = $url .$page;
     $test = curl($newpage);
+    if (strpos($page,'calendar') !== false) {
+        $calendarURL = $newpage;
+        echo "<h1>KALENDAR FUNNEN ". $calendarURL."</h1>";
+    }
     var_dump($test);
 }
 function curl($url){
@@ -32,13 +36,6 @@ function curl($url){
 function findURLs($data){
     preg_match_all("/<a href=\"([^\"]*)\">(.*)<\/a>/iU",$data, $matches);
     return $matches[1];
-}
-function scrape_between($data, $start, $end){
-
-    $data = stristr($data, $start); // Stripping all data from before $start
-    $data = substr($data, strlen($start));  // Stripping $start
-    $stop = stripos($data, $end);   // Getting the position of the $end of the data to scrape
-    $data = substr($data, 0, $stop);    // Stripping all data from after and including the $end of the data to scrape
 }
 function printResult(){
     //if det finns minst en kalender - annars error - inga kalendrar hittade

@@ -1,8 +1,7 @@
 <?php
+include("weekendOrganizer");
 $url = "localhost:8080";
-$calendarURL = "";
-$cinemaURL ="";
-$restaurantURL ="";
+$wo = new weekendOrganizer();
 
 $curl_scraped_page = curl($url);
 $curl_scraped_page = findURLs($curl_scraped_page);
@@ -10,11 +9,11 @@ foreach($curl_scraped_page as $page){
     $newpage = $url .$page;
     $test = curl($newpage);
     if (strpos($page,'calendar') !== false) {
-        $calendarURL = $newpage;
-        echo "<h1>KALENDAR FUNNEN ". $calendarURL."</h1>";
+        $wo->setCalendarURL($newpage);
     }
-    var_dump($test);
+    //var_dump($test);
 }
+printResult($wo);
 function curl($url){
     $options = Array(
         CURLOPT_RETURNTRANSFER => TRUE,  // Setting cURL's option to return the webpage data
@@ -37,8 +36,10 @@ function findURLs($data){
     preg_match_all("/<a href=\"([^\"]*)\">(.*)<\/a>/iU",$data, $matches);
     return $matches[1];
 }
-function printResult(){
-    //if det finns minst en kalender - annars error - inga kalendrar hittade
+function printResult($wo){
+    if($wo->getCalendarURL()){
+        Echo "Kalender finnes yahoo";
+    }
     //if det finns en biosida - annars ingen biosida hittad
     //if det finns minst en passande bio - annars ingen passande film hittad
 }

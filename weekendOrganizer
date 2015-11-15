@@ -1,0 +1,19 @@
+<?php
+class weekendOrganizer{
+    private $calendarURL;
+    private $cinemaURL;
+    private $restaurantURL;
+
+    public function setCalendarURL($url){
+        $this->calendarURL = $url;
+    }
+    public function getCalendarURL(){
+        if($this->calendarURL != null){
+            return $this->calendarURL;
+        }
+        else{
+            return false;
+        }
+    }
+}
+?>

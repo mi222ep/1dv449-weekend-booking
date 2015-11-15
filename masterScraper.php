@@ -26,6 +26,7 @@ class masterScraper{
                 echo $test;
             }
             echo "Kalendersida funnen";
+            $this->getTable();
         }
         else{
             echo "Ingen kalender funnen";
@@ -52,6 +53,44 @@ class masterScraper{
         $data = curl_exec($ch); // Executing the cURL request and assigning the returned data to the $data variable
         curl_close($ch);    // Closing cURL
         return $data;   // Returning the data from the function
+    }
+    function getTable(){
+        $days = array(
+            array("friday" => true,
+            "saturday" => false,
+            "sunday" => true),
+            array("friday" => false,
+                "saturday" => false,
+                "sunday" => true),
+            array("friday" => false,
+                "saturday" => false,
+                "sunday" => true),
+    );
+        $saturdayOK = true;
+        $fridayOK = true;
+        $sundayOK = true;
+
+        for( $i =0; $i<sizeof($days); $i++){
+            if($days[$i]["friday"] == false){
+                $fridayOK = false;
+            }
+            if($days[$i]["saturday"] == false){
+                $saturdayOK = false;
+            }
+            if($days[$i]["sunday"] == false){
+                $sundayOK = false;
+            }
+        }
+        if($fridayOK){
+            echo "Friday OK";
+        }
+        if($saturdayOK){
+            echo "saturday OK";
+        }
+        if($sundayOK){
+            echo "sunday ok";
+        }
+
     }
 }
 ?>

@@ -20,8 +20,10 @@ class masterScraper{
             $calendarPages = $this->curl($this->wo->getCalendarURL());
             $calendarPages = $this->findURLs($calendarPages);
             foreach($calendarPages as $page){
-                $calendarPage = $this->curl($this->wo->getCalendarURL() . $page);
-                echo $calendarPage;
+                $newurl = $this->wo->getCalendarURL();
+                $newurl .= "/" .$page;
+                $test = $this->curl($newurl);
+                echo $test;
             }
             echo "Kalendersida funnen";
         }

@@ -16,19 +16,18 @@ class daysToParty{
         return $this->shortNameOfDay;
     }
     public function addMovie($movie, $time){
-        $this->movies[$movie] = $time;
+        $this->movies[] = array("film" =>$movie, "tid" => $time);
     }
     public function addBarTableTimes($time){
         $this->barTableTimes[] = $time;
     }
     public function getTodaysPlans(){
         $plans = array();
-        var_dump($this->movies);
-        foreach($this->movies as $movieName=>$movieTime){
-            $movieHour = substr($movieTime, 0, 2);
+        for($i = 0; $i < sizeof($this->movies); $i++){
+            $movieHour = substr($this->movies[$i]["tid"], 0, 2);
             foreach($this->barTableTimes as $time){
                 if(substr($time, 0, 2) - $movieHour == 2){
-                    $plans[] = "Dagens planer: $this->nameOfDay ... $movieName klockan $movieTime ";
+                    $plans[] = "Dagens planer: $this->nameOfDay ... ". $this->movies[$i]['film']." klockan " . $this->movies[$i]["tid"];
                 }
             }
         }

@@ -21,4 +21,7 @@ class daysToParty{
     public function addBarTableTimes($time){
         $this->barTableTimes[] = $time;
     }
+    public function getTodaysPlans(){
+        return "exempel";
+    }
 }

@@ -27,8 +27,9 @@ class masterScraper{
             }
         }
         $this->analyzeCalendars();
-        //$this->analyzeCinema();
+        $this->analyzeCinema();
         $this->analyzeDinner();
+        $this->wo->getWeekendPlans();
     }
     function findURLs($data){
         preg_match_all("/<a href=\"([^\"]*)\">(.*)<\/a>/iU",$data, $matches);

@@ -34,5 +34,14 @@ class weekendOrganizer{
     public function getDaysToGoParty(){
         return $this->daysToGoParty;
     }
+    public function getWeekendPlans(){
+        $plans = array();
+        foreach($this->daysToGoParty as $days){
+            $plans[] = $days->getTodaysPlans();
+        }
+        foreach($plans as $plan){
+            echo $plan;
+        }
+    }
 }
 ?>

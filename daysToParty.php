@@ -22,6 +22,16 @@ class daysToParty{
         $this->barTableTimes[] = $time;
     }
     public function getTodaysPlans(){
-        return "exempel";
+        $plans = array();
+        var_dump($this->movies);
+        foreach($this->movies as $movieName=>$movieTime){
+            $movieHour = substr($movieTime, 0, 2);
+            foreach($this->barTableTimes as $time){
+                if(substr($time, 0, 2) - $movieHour == 2){
+                    $plans[] = "Dagens planer: $this->nameOfDay ... $movieName klockan $movieTime ";
+                }
+            }
+        }
+        return $plans;
     }
 }

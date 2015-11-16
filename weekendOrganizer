@@ -39,9 +39,8 @@ class weekendOrganizer{
         foreach($this->daysToGoParty as $days){
             $plans[] = $days->getTodaysPlans();
         }
-        foreach($plans as $plan){
-            echo $plan;
-        }
+        var_dump($plans);
+        return $plans;
     }
 }
 ?>

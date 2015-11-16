@@ -27,7 +27,8 @@ class masterScraper{
             }
         }
         $this->analyzeCalendars();
-        $this->analyzeCinema();
+        //$this->analyzeCinema();
+        $this->analyzeDinner();
     }
     function findURLs($data){
         preg_match_all("/<a href=\"([^\"]*)\">(.*)<\/a>/iU",$data, $matches);
@@ -72,17 +73,17 @@ class masterScraper{
         //$okDays = array();
         if($fridayOK){
             //array_push($okDays, "Fredag");
-            $day = new daysToParty("Fredag");
+            $day = new daysToParty("Fredag", "fre");
             $this->wo->addDayToGoParty($day);
         }
         if($saturdayOK){
             //array_push($okDays, "Lördag");
-            $day = new daysToParty("Lördag");
+            $day = new daysToParty("Lördag", "lor");
             $this->wo->addDayToGoParty($day);
         }
         if($sundayOK){
             //array_push($okDays, "Söndag");
-            $day = new daysToParty("Söndag");
+            $day = new daysToParty("Söndag", "son");
             $this->wo->addDayToGoParty($day);
         }
         //return $okDays;
@@ -180,5 +181,23 @@ class masterScraper{
         }
 
     }
-}
+    function analyzeDinner(){
+        if($this->wo->getRestaurantURL()){
+            $restaurantpage = $this->curl($this->wo->getRestaurantURL());
+            $DOM = new DOMDocument;
+            libxml_use_internal_errors(true);
+            $DOM->loadHTML($restaurantpage);
+            libxml_use_internal_errors(false);
+            $span = $DOM->getElementsByTagName('input');
+            foreach($span as $s){
+                    foreach($this->wo->getDaysToGoParty() as $day){
+                        $temp = $day->getShortName();
+                        if(preg_match("/".$temp ."/", $s->getAttribute("value"))){
+                            $time = str_replace($temp, "", $s->getAttribute("value"));
+                            $day->addBarTableTimes($time);
+                    }}
+
+        }
+    }
+}}
 ?>

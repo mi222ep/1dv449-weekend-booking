@@ -1,5 +1,6 @@
 <?php
 include("weekendOrganizer");
+include("daysToParty.php");
 class masterScraper{
     private $url = "localhost:8080";
     private $wo;
@@ -27,7 +28,6 @@ class masterScraper{
         }
         $avaibleDays = $this-> analyzeCalendars();
         $this->analyzeCinema($avaibleDays);
-
     }
     function findURLs($data){
         preg_match_all("/<a href=\"([^\"]*)\">(.*)<\/a>/iU",$data, $matches);
@@ -164,9 +164,6 @@ class masterScraper{
                         foreach($movies as $mKey => $mValue){
                             $this->curl2($this->wo->getCinemaURL() . "/check?day=".$day."&movie=". $mValue);
                         }
-                    }
-                    else{
-                        echo $a . $key;
                     }
                 }
             }

@@ -28,8 +28,8 @@ class weekendOrganizer{
     public function getRestaurantURL(){
         return $this->restaurantURL;
     }
-    public function addDayToGoParty(){
-
+    public function addDayToGoParty(daysToParty $day){
+        $this->daysToGoParty = $day;
     }
     public function getDaysToGoParty(){
         return $this->daysToGoParty;

@@ -71,13 +71,13 @@ class masterScraper{
         }
         $okDays = array();
         if($fridayOK){
-            array_push($okDays, "Friday");
+            array_push($okDays, "Fredag");
         }
         if($saturdayOK){
-            array_push($okDays, "Saturday");
+            array_push($okDays, "Lördag");
         }
         if($sundayOK){
-            array_push($okDays, "Sunday");
+            array_push($okDays, "Söndag");
         }
         return $okDays;
     }
@@ -101,7 +101,7 @@ class masterScraper{
     }
     function curl2($url){
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url . "/check?day=01&movie=01");
+        curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLINFO_HEADER_OUT, true);
@@ -127,7 +127,49 @@ class masterScraper{
     function analyzeCinema($aviableDays){
         if($this->wo->getCinemaURL()){
             $cinemaPage = $this->wo->getCinemaURL();
-            $this->curl2($cinemaPage);
+            $unparsedCinemaPage = $this->curl($cinemaPage);
+            $DOM = new DOMDocument;
+            $DOM->loadHTML($unparsedCinemaPage);
+            $days = $DOM->getElementsByTagName('option');
+            $daysForMovie = array();
+            for ($i = 0; $i < $days->length; $i++){
+                $valueID = $days->item($i)->getAttribute('value');
+                $dayToArray = $days->item($i)->nodeValue;
+                $daysForMovie[$dayToArray] = $valueID;
+            }
+            //Remove unneeded data from array
+            foreach($daysForMovie as $key =>$value ){
+                if($value ==""){
+                    unset($daysForMovie[$key]);
+                }
+            }
+            $latestValue=0;
+            $movies = array();
+            //Move movies to another array
+            foreach($daysForMovie as $key => $t){
+                if($t > $latestValue){
+                    $latestValue=$t;
+                    echo $latestValue;
+                }
+                else{
+                    $latestValue = 999;
+                    $movies[$key] = $t;
+                    unset($daysForMovie[$key]);
+                }
+            }
+            var_dump($aviableDays);
+            foreach($daysForMovie as $key => $day){
+                foreach($aviableDays as $a){
+                    if($a == $key){
+                        foreach($movies as $mKey => $mValue){
+                            $this->curl2($this->wo->getCinemaURL() . "/check?day=".$day."&movie=". $mValue);
+                        }
+                    }
+                    else{
+                        echo $a . $key;
+                    }
+                }
+            }
         }
 
     }

@@ -3,6 +3,7 @@ class weekendOrganizer{
     private $calendarURL;
     private $cinemaURL;
     private $restaurantURL;
+    private $daysToGoParty = array();
 
     public function setCalendarURL($url){
         $this->calendarURL = $url;
@@ -26,6 +27,12 @@ class weekendOrganizer{
     }
     public function getRestaurantURL(){
         return $this->restaurantURL;
+    }
+    public function addDayToGoParty(){
+
+    }
+    public function getDaysToGoParty(){
+        return $this->daysToGoParty;
     }
 }
 ?>

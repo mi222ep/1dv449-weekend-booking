@@ -23,7 +23,9 @@ class masterScraper{
                 $newurl = $this->wo->getCalendarURL();
                 $newurl .= "/" .$page;
                 $test = $this->curl($newurl);
-                echo $test;
+                $test = $this->findTable($test);
+                for ($i = 0; $i < $test->length; $i++)
+                    echo $test->item($i)->nodeValue . "<br/>";
             }
             echo "Kalendersida funnen";
             $this->analyzeTableFromCalendar();
@@ -35,6 +37,28 @@ class masterScraper{
     function findURLs($data){
         preg_match_all("/<a href=\"([^\"]*)\">(.*)<\/a>/iU",$data, $matches);
         return $matches[1];
+    }
+    function findTable($data){
+        $DOM = new DOMDocument;
+        $DOM->loadHTML($data);
+        $days = $DOM->getElementByTagName('th');
+        $items = $DOM->getElementsByTagName('td');
+        $test = array();
+        for ($i = 0; $i < $items->length; $i++){
+            $dayToArray = $days->item($i)->nodeValue;
+            $okOrNotToArray = $items->item($i)->nodeValue ;
+            $test[$dayToArray] = $okOrNotToArray;
+        }
+        foreach($test as $t){
+            if(preg_match("/ok/i",$t)){
+                echo "true";
+            }
+            else{
+                echo "false";
+            }
+            var_dump($test);
+        }
+        return $items;
     }
     function curl($url){
         $options = Array(

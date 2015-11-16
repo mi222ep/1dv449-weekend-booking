@@ -26,8 +26,8 @@ class masterScraper{
                 $this->wo->setRestaurantURL($newpage);
             }
         }
-        $avaibleDays = $this-> analyzeCalendars();
-        $this->analyzeCinema($avaibleDays);
+        $this->analyzeCalendars();
+        $this->analyzeCinema();
     }
     function findURLs($data){
         preg_match_all("/<a href=\"([^\"]*)\">(.*)<\/a>/iU",$data, $matches);
@@ -69,17 +69,23 @@ class masterScraper{
                 $sundayOK = false;
             }
         }
-        $okDays = array();
+        //$okDays = array();
         if($fridayOK){
-            array_push($okDays, "Fredag");
+            //array_push($okDays, "Fredag");
+            $day = new daysToParty("Fredag");
+            $this->wo->addDayToGoParty($day);
         }
         if($saturdayOK){
-            array_push($okDays, "Lördag");
+            //array_push($okDays, "Lördag");
+            $day = new daysToParty("Lördag");
+            $this->wo->addDayToGoParty($day);
         }
         if($sundayOK){
-            array_push($okDays, "Söndag");
+            //array_push($okDays, "Söndag");
+            $day = new daysToParty("Söndag");
+            $this->wo->addDayToGoParty($day);
         }
-        return $okDays;
+        //return $okDays;
     }
     function curl($url){
         $options = Array(
@@ -106,7 +112,7 @@ class masterScraper{
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLINFO_HEADER_OUT, true);
         $info = curl_exec($ch);
-        echo $info;
+        return $info;
     }
     function analyzeCalendars(){
         if($this->wo->getCalendarURL()){
@@ -120,11 +126,11 @@ class masterScraper{
                 $test = $this->findTable($test);
                 array_push($calendars, $test);
             }
-            return $this->analyzeTableFromCalendar($calendars);
+            $this->analyzeTableFromCalendar($calendars);
         }
-        return null;
+        //return null;
     }
-    function analyzeCinema($aviableDays){
+    function analyzeCinema(){
         if($this->wo->getCinemaURL()){
             $cinemaPage = $this->wo->getCinemaURL();
             $unparsedCinemaPage = $this->curl($cinemaPage);
@@ -149,7 +155,6 @@ class masterScraper{
             foreach($daysForMovie as $key => $t){
                 if($t > $latestValue){
                     $latestValue=$t;
-                    echo $latestValue;
                 }
                 else{
                     $latestValue = 999;
@@ -157,12 +162,17 @@ class masterScraper{
                     unset($daysForMovie[$key]);
                 }
             }
-            var_dump($aviableDays);
             foreach($daysForMovie as $key => $day){
-                foreach($aviableDays as $a){
-                    if($a == $key){
+                foreach($this->wo->getDaysToGoParty() as $a){
+                    if($a->getNameOfDay() == $key){
                         foreach($movies as $mKey => $mValue){
-                            $this->curl2($this->wo->getCinemaURL() . "/check?day=".$day."&movie=". $mValue);
+                            $movieData = $this->curl2($this->wo->getCinemaURL() . "/check?day=".$day."&movie=". $mValue);
+                            $moviesDecoded = (array) json_decode($movieData, true);
+                            for($i =0; $i<sizeof($moviesDecoded); $i++){
+                                if($moviesDecoded[$i]["status"] == 1){
+                                    $a->addMovie($mKey, $moviesDecoded[$i]["time"]);
+                                }
+                            }
                         }
                     }
                 }

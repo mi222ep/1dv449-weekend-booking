@@ -12,6 +12,7 @@ class daysToParty{
     }
     public function addMovie($movie, $time){
         $this->movies[$movie] = $time;
+        echo "movie added: $movie, klockan: $time";
     }
     public function addBarTableTimes($time){
         $this->barTableTimes[] = $time;

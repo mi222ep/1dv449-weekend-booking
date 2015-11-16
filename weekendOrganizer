@@ -29,7 +29,7 @@ class weekendOrganizer{
         return $this->restaurantURL;
     }
     public function addDayToGoParty(daysToParty $day){
-        $this->daysToGoParty = $day;
+        $this->daysToGoParty[] = $day;
     }
     public function getDaysToGoParty(){
         return $this->daysToGoParty;

@@ -8,12 +8,13 @@ class masterScraper{
     $this->wo = new weekendOrganizer();
     }
     public function scrapePage(){
+        //Scrapes main page for URLs, set URLs in wo class
         $curl_scraped_page = $this->curl($this->url);
         $curl_scraped_page = $this->findURLs($curl_scraped_page);
 
+        //Checks found links for key words and sets URLs in wo class
         foreach($curl_scraped_page as $page) {
             $newpage = $this->url . $page;
-            //Set calendar page
             if (strpos($page, 'calendar') !== false) {
                 $this->wo->setCalendarURL($newpage);
             }
@@ -21,26 +22,12 @@ class masterScraper{
                 $this->wo->setCinemaURL($newpage);
             }
             else if(strpos($page, 'dinner')){
+                $this->wo->setRestaurantURL($newpage);
+            }
+        }
+        $avaibleDays = $this-> analyzeCalendars();
+        $this->analyzeCinema($avaibleDays);
 
-            }
-        }
-        if($this->wo->getCalendarURL()){
-            $calendarPages = $this->curl($this->wo->getCalendarURL());
-            $calendarPages = $this->findURLs($calendarPages);
-            $calendars  = array();
-            foreach($calendarPages as $page){
-                $newurl = $this->wo->getCalendarURL();
-                $newurl .= "/" .$page;
-                $test = $this->curl($newurl);
-                $test = $this->findTable($test);
-                array_push($calendars, $test);
-            }
-            echo "Kalendersida funnen";
-            $this->analyzeTableFromCalendar($calendars);
-        }
-        else{
-            echo "Ingen kalender funnen";
-        }
     }
     function findURLs($data){
         preg_match_all("/<a href=\"([^\"]*)\">(.*)<\/a>/iU",$data, $matches);
@@ -82,15 +69,17 @@ class masterScraper{
                 $sundayOK = false;
             }
         }
+        $okDays = array();
         if($fridayOK){
-            echo "Friday OK";
+            array_push($okDays, "Friday");
         }
         if($saturdayOK){
-            echo "saturday OK";
+            array_push($okDays, "Saturday");
         }
         if($sundayOK){
-            echo "sunday ok";
+            array_push($okDays, "Sunday");
         }
+        return $okDays;
     }
     function curl($url){
         $options = Array(
@@ -109,6 +98,38 @@ class masterScraper{
         $data = curl_exec($ch); // Executing the cURL request and assigning the returned data to the $data variable
         curl_close($ch);    // Closing cURL
         return $data;   // Returning the data from the function
+    }
+    function curl2($url){
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url . "/check?day=01&movie=01");
+        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+        $info = curl_exec($ch);
+        echo $info;
+    }
+    function analyzeCalendars(){
+        if($this->wo->getCalendarURL()){
+            $calendarPages = $this->curl($this->wo->getCalendarURL());
+            $calendarPages = $this->findURLs($calendarPages);
+            $calendars  = array();
+            foreach($calendarPages as $page){
+                $newurl = $this->wo->getCalendarURL();
+                $newurl .= "/" .$page;
+                $test = $this->curl($newurl);
+                $test = $this->findTable($test);
+                array_push($calendars, $test);
+            }
+            return $this->analyzeTableFromCalendar($calendars);
+        }
+        return null;
+    }
+    function analyzeCinema($aviableDays){
+        if($this->wo->getCinemaURL()){
+            $cinemaPage = $this->wo->getCinemaURL();
+            $this->curl2($cinemaPage);
+        }
+
     }
 }
 ?>

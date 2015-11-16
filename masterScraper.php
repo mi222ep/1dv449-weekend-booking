@@ -20,6 +20,9 @@ class masterScraper{
             else if (strpos($page, 'cinema') !== false){
                 $this->wo->setCinemaURL($newpage);
             }
+            else if(strpos($page, 'dinner')){
+
+            }
         }
         if($this->wo->getCalendarURL()){
             $calendarPages = $this->curl($this->wo->getCalendarURL());

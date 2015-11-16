@@ -21,5 +21,11 @@ class weekendOrganizer{
     public function getCinemaURL(){
         return $this->cinemaURL;
     }
+    public function setRestaurantURL($url){
+        $this->restaurantURL = $url;
+    }
+    public function getRestaurantURL(){
+        return $this->restaurantURL;
+    }
 }
 ?>

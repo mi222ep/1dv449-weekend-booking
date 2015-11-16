@@ -10,25 +10,30 @@ class masterScraper{
     public function scrapePage(){
         $curl_scraped_page = $this->curl($this->url);
         $curl_scraped_page = $this->findURLs($curl_scraped_page);
+
         foreach($curl_scraped_page as $page) {
             $newpage = $this->url . $page;
+            //Set calendar page
             if (strpos($page, 'calendar') !== false) {
                 $this->wo->setCalendarURL($newpage);
+            }
+            else if (strpos($page, 'cinema') !== false){
+                $this->wo->setCinemaURL($newpage);
             }
         }
         if($this->wo->getCalendarURL()){
             $calendarPages = $this->curl($this->wo->getCalendarURL());
             $calendarPages = $this->findURLs($calendarPages);
+            $calendars  = array();
             foreach($calendarPages as $page){
                 $newurl = $this->wo->getCalendarURL();
                 $newurl .= "/" .$page;
                 $test = $this->curl($newurl);
                 $test = $this->findTable($test);
-                for ($i = 0; $i < $test->length; $i++)
-                    echo $test->item($i)->nodeValue . "<br/>";
+                array_push($calendars, $test);
             }
             echo "Kalendersida funnen";
-            $this->analyzeTableFromCalendar();
+            $this->analyzeTableFromCalendar($calendars);
         }
         else{
             echo "Ingen kalender funnen";
@@ -41,24 +46,48 @@ class masterScraper{
     function findTable($data){
         $DOM = new DOMDocument;
         $DOM->loadHTML($data);
-        $days = $DOM->getElementByTagName('th');
+        $days = $DOM->getElementsByTagName('th');
         $items = $DOM->getElementsByTagName('td');
         $test = array();
         for ($i = 0; $i < $items->length; $i++){
             $dayToArray = $days->item($i)->nodeValue;
-            $okOrNotToArray = $items->item($i)->nodeValue ;
-            $test[$dayToArray] = $okOrNotToArray;
-        }
-        foreach($test as $t){
-            if(preg_match("/ok/i",$t)){
-                echo "true";
+            $okOrNotToArray = $items->item($i)->nodeValue;
+            if(preg_match("/ok/i", $okOrNotToArray)){
+                $okOrNotToArray =true;
             }
             else{
-                echo "false";
+                $okOrNotToArray = false;
             }
-            var_dump($test);
+            $test[$dayToArray] = $okOrNotToArray;
         }
-        return $items;
+        return $test;
+    }
+    function analyzeTableFromCalendar($arr){
+
+        $saturdayOK = true;
+        $fridayOK = true;
+        $sundayOK = true;
+
+        for( $i =0; $i<sizeof($arr); $i++){
+            if($arr[$i]["Friday"] == false){
+                $fridayOK = false;
+            }
+            if($arr[$i]["Saturday"] == false){
+                $saturdayOK = false;
+            }
+            if($arr[$i]["Sunday"] == false){
+                $sundayOK = false;
+            }
+        }
+        if($fridayOK){
+            echo "Friday OK";
+        }
+        if($saturdayOK){
+            echo "saturday OK";
+        }
+        if($sundayOK){
+            echo "sunday ok";
+        }
     }
     function curl($url){
         $options = Array(
@@ -77,48 +106,6 @@ class masterScraper{
         $data = curl_exec($ch); // Executing the cURL request and assigning the returned data to the $data variable
         curl_close($ch);    // Closing cURL
         return $data;   // Returning the data from the function
-    }
-    function getTable($calendars){
-        //Get from string between <Thread> and </T-body>
-        //Put thread in one array, body in another - merge together
-        //Return array
-    }
-    function analyzeTableFromCalendar(){
-        $days = array(
-            array("friday" => true,
-                "saturday" => false,
-                "sunday" => true),
-            array("friday" => false,
-                "saturday" => false,
-                "sunday" => true),
-            array("friday" => false,
-                "saturday" => false,
-                "sunday" => true),
-        );
-        $saturdayOK = true;
-        $fridayOK = true;
-        $sundayOK = true;
-
-        for( $i =0; $i<sizeof($days); $i++){
-            if($days[$i]["friday"] == false){
-                $fridayOK = false;
-            }
-            if($days[$i]["saturday"] == false){
-                $saturdayOK = false;
-            }
-            if($days[$i]["sunday"] == false){
-                $sundayOK = false;
-            }
-        }
-        if($fridayOK){
-            echo "Friday OK";
-        }
-        if($saturdayOK){
-            echo "saturday OK";
-        }
-        if($sundayOK){
-            echo "sunday ok";
-        }
     }
 }
 ?>

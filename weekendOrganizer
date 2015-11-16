@@ -15,5 +15,11 @@ class weekendOrganizer{
             return false;
         }
     }
+    public function setCinemaURL($url){
+        $this->cinemaURL = $url;
+    }
+    public function getCinemaURL(){
+        return $this->cinemaURL;
+    }
 }
 ?>

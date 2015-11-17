@@ -1,15 +1,18 @@
 <?php
 namespace model;
 require_once("/model/calendarModel.php");
+require_once("/model/cinemaModel.php");
 class weekendOrganizer{
     private $calendarURL;
     private $cinemaURL;
     private $restaurantURL;
     private $daysToGoParty = array();
-    private $cm;
+    private $calendarModel;
+    private $cinemaModel;
 
     public function __construct(){
-        $this->cm = new calendarModel();
+        $this->calendarModel = new calendarModel();
+        $this->cinemaModel = new cinemaModel();
     }
     public function setCalendarURL($url){
         $this->calendarURL = $url;
@@ -48,11 +51,15 @@ class weekendOrganizer{
         var_dump($plans);
         return $plans;
     }
+    public function analyzeCinema($unparsedCinemaPage){
+        return $this->cinemaModel->getArrayOfMovies($unparsedCinemaPage);
+        //$this->daysToGoParty = $this->cinemaModel->addMoviesToPartydays($arr, $this->daysToGoParty, $this->cinemaURL);
+    }
     public function analyzeCalendars($arr){
-        $this->daysToGoParty = $this->cm->analyzeTableFromCalendar($arr);
+        $this->daysToGoParty = $this->calendarModel->analyzeTableFromCalendar($arr);
     }
     public function getTableFromCalendar($arr){
-        return $this->cm->findTable($arr);
+        return $this->calendarModel->findTable($arr);
     }
 }
 ?>

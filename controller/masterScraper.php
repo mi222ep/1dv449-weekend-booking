@@ -49,25 +49,6 @@ class masterScraper{
         preg_match_all("/<a href=\"([^\"]*)\">(.*)<\/a>/iU",$data, $matches);
         return $matches[1];
     }
-    function findTable($data){
-        $DOM = new \DOMDocument;
-        $DOM->loadHTML($data);
-        $days = $DOM->getElementsByTagName('th');
-        $items = $DOM->getElementsByTagName('td');
-        $test = array();
-        for ($i = 0; $i < $items->length; $i++){
-            $dayToArray = $days->item($i)->nodeValue;
-            $okOrNotToArray = $items->item($i)->nodeValue;
-            if(preg_match("/ok/i", $okOrNotToArray)){
-                $okOrNotToArray =true;
-            }
-            else{
-                $okOrNotToArray = false;
-            }
-            $test[$dayToArray] = $okOrNotToArray;
-        }
-        return $test;
-    }
     function curl($url){
         $options = Array(
             CURLOPT_RETURNTRANSFER => TRUE,  // Setting cURL's option to return the webpage data
@@ -107,16 +88,7 @@ class masterScraper{
         if($this->wo->getCinemaURL()){
             $cinemaPage = $this->wo->getCinemaURL();
             $unparsedCinemaPage = $this->curl($cinemaPage);
-            $DOM = new \DOMDocument;
-            $DOM->loadHTML($unparsedCinemaPage);
-            $days = $DOM->getElementsByTagName('option');
-            $daysForMovie = array();
-            for ($i = 0; $i < $days->length; $i++){
-                $valueID = $days->item($i)->getAttribute('value');
-                $dayToArray = $days->item($i)->nodeValue;
-                $daysForMovie[$dayToArray] = $valueID;
-            }
-            //Remove unneeded data from array
+            $daysForMovie = $this->wo->analyzeCinema($unparsedCinemaPage);
             foreach($daysForMovie as $key =>$value ){
                 if($value ==""){
                     unset($daysForMovie[$key]);

@@ -4,20 +4,26 @@ class plannerView{
 
     private static $url = "url";
     private static $textEntered = "entered";
-    public function render(){
 
-    }
     public function renderNewPlans(\model\weekendOrganizer $organizer){
         $this->renderHeader();
         echo $this->generateTextEnter();
         $plans = $organizer->getWeekendPlans();
         if($this->isAdressedTyped()){
-            foreach($plans as $plan){
-                foreach($plan as $p){
-                    echo $p->day;
-                    echo $p->time;
-                    echo $p->movie;
-                    echo "<br>";
+            if($plans == null){
+                if($organizer->wasURLsFound()){
+                    Echo "Alla sidor hittades, men alla krav kan ej uppfyllas.";
+                }
+                else{
+                    Echo "Hittade inte alla sidor. Har du angett korrekt adress?";
+                }
+            }
+            else{
+                Echo "<h2>Filmerna nedan passar alla. Lediga bord finns hos Zeke efter filmen.</h2>";
+                foreach($plans as $plan){
+                    foreach($plan as $p){
+                        echo "<b>$p->day</b> klockan $p->time visas filmen $p->movie <br>";
+                    }
                 }
             }
         }
@@ -47,7 +53,7 @@ class plannerView{
 
 					<label for="' . self::$url . '">URL :</label>
 					<input type="text" id="' . self::$url . '" name="' . self::$url . '" />
-					<input type="submit" name="' . self::$textEntered . '" value="login" />
+					<input type="submit" name="' . self::$textEntered . '" value="planera" />
 				</fieldset>
 			</form>
 		';

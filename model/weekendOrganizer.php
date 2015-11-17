@@ -59,5 +59,13 @@ class weekendOrganizer{
     public function getTableFromCalendar($arr){
         return $this->calendarModel->findTable($arr);
     }
+    public function wasURLsFound(){
+        if($this->calendarURL != null && $this->cinemaURL != null && $this->restaurantURL !=null){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 }
 ?>

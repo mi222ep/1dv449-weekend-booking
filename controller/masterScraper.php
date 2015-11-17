@@ -18,7 +18,6 @@ class masterScraper{
     public function scrapePage(){
         if($this->view->isAdressedTyped()){
             $this->url = $this->view->getURL();
-
             $curl_scraped_page = $this->curl($this->url);
             $curl_scraped_page = $this->findURLs($curl_scraped_page);
 

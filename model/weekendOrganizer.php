@@ -1,5 +1,6 @@
 <?php
 namespace model;
+require_once("/model/calendarModel.php");
 class weekendOrganizer{
     private $calendarURL;
     private $cinemaURL;
@@ -42,6 +43,10 @@ class weekendOrganizer{
         }
         var_dump($plans);
         return $plans;
+    }
+    public function analyzeCalendars($arr){
+        $cm = new calendarModel();
+        $this->daysToGoParty = $cm->analyzeTableFromCalendar($arr);
     }
 }
 ?>

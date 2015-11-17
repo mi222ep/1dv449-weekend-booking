@@ -1,7 +1,10 @@
 <?php
 namespace controller;
 
+use view\plannerView;
+
 require_once("/model/weekendOrganizer.php");
+require_once("/view/plannerView.php");
 class masterScraper{
     private $url = "localhost:8080";
     private $wo;
@@ -42,7 +45,10 @@ class masterScraper{
         $this->analyzeCalendars();
         $this->analyzeCinema();
         $this->analyzeDinner();
-        $this->wo->getWeekendPlans();
+        $plans = $this->wo->getWeekendPlans();
+        $view = new plannerView();
+        $view->renderNewPlans($plans);
+
 
     }
     function findURLs($data){

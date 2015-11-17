@@ -48,12 +48,10 @@ class weekendOrganizer{
         foreach($this->daysToGoParty as $days){
             $plans[] = $days->getTodaysPlans();
         }
-        var_dump($plans);
         return $plans;
     }
     public function analyzeCinema($unparsedCinemaPage){
         return $this->cinemaModel->getArrayOfMovies($unparsedCinemaPage);
-        //$this->daysToGoParty = $this->cinemaModel->addMoviesToPartydays($arr, $this->daysToGoParty, $this->cinemaURL);
     }
     public function analyzeCalendars($arr){
         $this->daysToGoParty = $this->calendarModel->analyzeTableFromCalendar($arr);

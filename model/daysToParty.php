@@ -1,5 +1,6 @@
 <?php
 namespace model;
+require_once("confirmedPlan.php");
 class daysToParty{
     private $nameOfDay;
     private $shortNameOfDay;
@@ -24,11 +25,12 @@ class daysToParty{
     }
     public function getTodaysPlans(){
         $plans = array();
-        for($i = 0; $i < sizeof($this->movies); $i++){
-            $movieHour = substr($this->movies[$i]["tid"], 0, 2);
+        foreach($this->movies as $movies){
+            $movieHour = substr($movies["tid"], 0, 2);
             foreach($this->barTableTimes as $time){
                 if(substr($time, 0, 2) - $movieHour == 2){
-                    $plans[] = "Dagens planer: $this->nameOfDay ... ". $this->movies[$i]['film']." klockan " . $this->movies[$i]["tid"];
+                    $plans[] = new confirmedPlan($this->nameOfDay,$movies["tid"], $movies['film']);
+                    //$plans[] = array("day"=>$this->nameOfDay, "movie"=>$movies['film'], "time"=>$movies["tid"]);
                 }
             }
         }

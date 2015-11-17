@@ -1,11 +1,12 @@
 <?php
+namespace model;
 class daysToParty{
     private $nameOfDay;
     private $shortNameOfDay;
     private $movies = array();
     private $barTableTimes = array();
 
-    public function daysToParty($day, $short){
+    public function __construct($day, $short){
         $this->nameOfDay = $day;
         $this->shortNameOfDay = $short;
     }

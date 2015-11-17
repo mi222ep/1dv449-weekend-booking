@@ -1,15 +1,17 @@
 <?php
-include("weekendOrganizer.php");
-include("daysToParty.php");
+namespace controller;
+
+require_once("/model/weekendOrganizer.php");
+require_once("/model/daysToParty.php");
 class masterScraper{
     private $url = "localhost:8080";
     private $wo;
 
-    public function masterScraper(){
-    $this->wo = new weekendOrganizer();
+    public function __construct(){
+    $this->wo = new \model\weekendOrganizer();
     }
+    //Scrapes main page for URLs, set URLs in wo class
     public function scrapePage(){
-        //Scrapes main page for URLs, set URLs in wo class
         $curl_scraped_page = $this->curl($this->url);
         $curl_scraped_page = $this->findURLs($curl_scraped_page);
 
@@ -36,7 +38,7 @@ class masterScraper{
         return $matches[1];
     }
     function findTable($data){
-        $DOM = new DOMDocument;
+        $DOM = new \DOMDocument;
         $DOM->loadHTML($data);
         $days = $DOM->getElementsByTagName('th');
         $items = $DOM->getElementsByTagName('td');
@@ -74,17 +76,18 @@ class masterScraper{
         //$okDays = array();
         if($fridayOK){
             //array_push($okDays, "Fredag");
-            $day = new daysToParty("Fredag", "fre");
+            $day = new \model\daysToParty("Fredag", "fre");
             $this->wo->addDayToGoParty($day);
+            Echo "Fredag";
         }
         if($saturdayOK){
             //array_push($okDays, "Lördag");
-            $day = new daysToParty("Lördag", "lor");
+            $day = new \model\daysToParty("Lördag", "lor");
             $this->wo->addDayToGoParty($day);
         }
         if($sundayOK){
             //array_push($okDays, "Söndag");
-            $day = new daysToParty("Söndag", "son");
+            $day = new \model\daysToParty("Söndag", "son");
             $this->wo->addDayToGoParty($day);
         }
         //return $okDays;
@@ -136,7 +139,7 @@ class masterScraper{
         if($this->wo->getCinemaURL()){
             $cinemaPage = $this->wo->getCinemaURL();
             $unparsedCinemaPage = $this->curl($cinemaPage);
-            $DOM = new DOMDocument;
+            $DOM = new \DOMDocument;
             $DOM->loadHTML($unparsedCinemaPage);
             $days = $DOM->getElementsByTagName('option');
             $daysForMovie = array();
@@ -180,12 +183,14 @@ class masterScraper{
                 }
             }
         }
+        else{
+        }
 
     }
     function analyzeDinner(){
         if($this->wo->getRestaurantURL()){
             $restaurantpage = $this->curl($this->wo->getRestaurantURL());
-            $DOM = new DOMDocument;
+            $DOM = new \DOMDocument;
             libxml_use_internal_errors(true);
             $DOM->loadHTML($restaurantpage);
             libxml_use_internal_errors(false);

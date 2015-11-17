@@ -1,5 +1,5 @@
 <?php
-require_once ("masterScraper.php");
-$ms = new masterScraper();
+require_once("controller/masterScraper.php");
+$ms = new \controller\masterScraper();
 $ms->scrapePage();
 ?>

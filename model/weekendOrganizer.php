@@ -1,4 +1,5 @@
 <?php
+namespace model;
 class weekendOrganizer{
     private $calendarURL;
     private $cinemaURL;

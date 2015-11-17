@@ -1,5 +1,5 @@
 <?php
-include("weekendOrganizer");
+include("weekendOrganizer.php");
 include("daysToParty.php");
 class masterScraper{
     private $url = "localhost:8080";

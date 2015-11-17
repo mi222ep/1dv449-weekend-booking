@@ -34,4 +34,23 @@ class calendarModel{
         }
         return $days;
     }
+    function findTable($data){
+        $DOM = new \DOMDocument;
+        $DOM->loadHTML($data);
+        $days = $DOM->getElementsByTagName('th');
+        $items = $DOM->getElementsByTagName('td');
+        $test = array();
+        for ($i = 0; $i < $items->length; $i++){
+            $dayToArray = $days->item($i)->nodeValue;
+            $okOrNotToArray = $items->item($i)->nodeValue;
+            if(preg_match("/ok/i", $okOrNotToArray)){
+                $okOrNotToArray =true;
+            }
+            else{
+                $okOrNotToArray = false;
+            }
+            $test[$dayToArray] = $okOrNotToArray;
+        }
+        return $test;
+    }
 }

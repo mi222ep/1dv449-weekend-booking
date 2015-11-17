@@ -6,7 +6,11 @@ class weekendOrganizer{
     private $cinemaURL;
     private $restaurantURL;
     private $daysToGoParty = array();
+    private $cm;
 
+    public function __construct(){
+        $this->cm = new calendarModel();
+    }
     public function setCalendarURL($url){
         $this->calendarURL = $url;
     }
@@ -45,8 +49,10 @@ class weekendOrganizer{
         return $plans;
     }
     public function analyzeCalendars($arr){
-        $cm = new calendarModel();
-        $this->daysToGoParty = $cm->analyzeTableFromCalendar($arr);
+        $this->daysToGoParty = $this->cm->analyzeTableFromCalendar($arr);
+    }
+    public function getTableFromCalendar($arr){
+        return $this->cm->findTable($arr);
     }
 }
 ?>

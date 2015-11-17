@@ -2,7 +2,6 @@
 namespace controller;
 
 require_once("/model/weekendOrganizer.php");
-require_once("/model/daysToParty.php");
 class masterScraper{
     private $url = "localhost:8080";
     private $wo;
@@ -16,6 +15,18 @@ class masterScraper{
         $curl_scraped_page = $this->findURLs($curl_scraped_page);
 
         //Checks found links for key words and sets URLs in wo class
+        foreach($curl_scraped_page as $page) {
+            $newpage = $this->url . $page;
+            if (strpos($page, 'calendar') !== false) {
+                $this->wo->setCalendarURL($newpage);
+            }
+            else if (strpos($page, 'cinema') !== false){
+                $this->wo->setCinemaURL($newpage);
+            }
+            else if(strpos($page, 'dinner')){
+                $this->wo->setRestaurantURL($newpage);
+            }
+        }
         foreach($curl_scraped_page as $page) {
             $newpage = $this->url . $page;
             if (strpos($page, 'calendar') !== false) {
@@ -57,37 +68,6 @@ class masterScraper{
         }
         return $test;
     }
-    function analyzeTableFromCalendar($arr){
-
-        $saturdayOK = true;
-        $fridayOK = true;
-        $sundayOK = true;
-
-        for( $i =0; $i<sizeof($arr); $i++){
-            if($arr[$i]["Friday"] == false){
-                $fridayOK = false;
-            }
-            if($arr[$i]["Saturday"] == false){
-                $saturdayOK = false;
-            }
-            if($arr[$i]["Sunday"] == false){
-                $sundayOK = false;
-            }
-        }
-        if($fridayOK){
-            $day = new \model\daysToParty("Fredag", "fre");
-            $this->wo->addDayToGoParty($day);
-            Echo "Fredag";
-        }
-        if($saturdayOK){
-            $day = new \model\daysToParty("Lördag", "lor");
-            $this->wo->addDayToGoParty($day);
-        }
-        if($sundayOK){
-            $day = new \model\daysToParty("Söndag", "son");
-            $this->wo->addDayToGoParty($day);
-        }
-    }
     function curl($url){
         $options = Array(
             CURLOPT_RETURNTRANSFER => TRUE,  // Setting cURL's option to return the webpage data
@@ -107,12 +87,6 @@ class masterScraper{
         return $data;   // Returning the data from the function
     }
     function analyzeCalendars(){
-
-        //Get URLs
-        //scrape all URLs
-        //push to array
-        //Analyze array
-
         if($this->wo->getCalendarURL()){
             $calendarURL = $this->wo->getCalendarURL();
             $calendarPages = $this->curl($calendarURL);
@@ -122,11 +96,11 @@ class masterScraper{
                 $newurl = $calendarURL;
                 $newurl .= "/" .$page;
                 $test = $this->curl($newurl);
-                $test = $this->findTable($test);
+                $test=$this->wo->getTableFromCalendar($test);
+                //$test = $this->findTable($test);
                 array_push($calendars, $test);
             }
             $this->wo->analyzeCalendars($calendars);
-            //$this->analyzeTableFromCalendar($calendars);
         }
     }
     function analyzeCinema(){

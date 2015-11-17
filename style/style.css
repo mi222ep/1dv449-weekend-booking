@@ -1,0 +1,9 @@
+body{
+    background-color: beige;
+}
+#contentwrapper{
+    width: 80%;
+    margin: 0 auto;
+    padding-top: 200px;
+    text-align: center;
+}

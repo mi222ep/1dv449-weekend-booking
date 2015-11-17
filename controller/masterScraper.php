@@ -6,48 +6,52 @@ use view\plannerView;
 require_once("/model/weekendOrganizer.php");
 require_once("/view/plannerView.php");
 class masterScraper{
-    private $url = "localhost:8080";
+    private $url;
     private $wo;
+    private $view;
 
     public function __construct(){
-    $this->wo = new \model\weekendOrganizer();
+        $this->wo = new \model\weekendOrganizer();
+        $this->view = new plannerView();
     }
     //Scrapes main page for URLs, set URLs in wo class
     public function scrapePage(){
-        $curl_scraped_page = $this->curl($this->url);
-        $curl_scraped_page = $this->findURLs($curl_scraped_page);
+        if($this->view->isAdressedTyped()){
+            $this->url = $this->view->getURL();
 
-        //Checks found links for key words and sets URLs in wo class
-        foreach($curl_scraped_page as $page) {
-            $newpage = $this->url . $page;
-            if (strpos($page, 'calendar') !== false) {
-                $this->wo->setCalendarURL($newpage);
+            $curl_scraped_page = $this->curl($this->url);
+            $curl_scraped_page = $this->findURLs($curl_scraped_page);
+
+            //Checks found links for key words and sets URLs in wo class
+            foreach($curl_scraped_page as $page) {
+                $newpage = $this->url . $page;
+                if (strpos($page, 'calendar') !== false) {
+                    $this->wo->setCalendarURL($newpage);
+                }
+                else if (strpos($page, 'cinema') !== false){
+                    $this->wo->setCinemaURL($newpage);
+                }
+                else if(strpos($page, 'dinner')){
+                    $this->wo->setRestaurantURL($newpage);
+                }
             }
-            else if (strpos($page, 'cinema') !== false){
-                $this->wo->setCinemaURL($newpage);
+            foreach($curl_scraped_page as $page) {
+                $newpage = $this->url . $page;
+                if (strpos($page, 'calendar') !== false) {
+                    $this->wo->setCalendarURL($newpage);
+                }
+                else if (strpos($page, 'cinema') !== false){
+                    $this->wo->setCinemaURL($newpage);
+                }
+                else if(strpos($page, 'dinner')){
+                    $this->wo->setRestaurantURL($newpage);
+                }
             }
-            else if(strpos($page, 'dinner')){
-                $this->wo->setRestaurantURL($newpage);
-            }
+            $this->analyzeCalendars();
+            $this->analyzeCinema();
+            $this->analyzeDinner();
         }
-        foreach($curl_scraped_page as $page) {
-            $newpage = $this->url . $page;
-            if (strpos($page, 'calendar') !== false) {
-                $this->wo->setCalendarURL($newpage);
-            }
-            else if (strpos($page, 'cinema') !== false){
-                $this->wo->setCinemaURL($newpage);
-            }
-            else if(strpos($page, 'dinner')){
-                $this->wo->setRestaurantURL($newpage);
-            }
-        }
-        $this->analyzeCalendars();
-        $this->analyzeCinema();
-        $this->analyzeDinner();
-        $plans = $this->wo->getWeekendPlans();
-        $view = new plannerView();
-        $view->renderNewPlans($plans);
+        $this->view->renderNewPlans($this->wo);
 
 
     }

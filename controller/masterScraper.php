@@ -3,8 +3,8 @@ namespace controller;
 
 use view\plannerView;
 
-require_once("/model/weekendOrganizer.php");
-require_once("/view/plannerView.php");
+require_once("model/weekendOrganizer.php");
+require_once("view/plannerView.php");
 class masterScraper{
     private $url;
     private $wo;

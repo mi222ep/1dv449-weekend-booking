@@ -1,7 +1,7 @@
 <?php
 namespace model;
-require_once("/model/calendarModel.php");
-require_once("/model/cinemaModel.php");
+require_once("model/calendarModel.php");
+require_once("model/cinemaModel.php");
 class weekendOrganizer{
     private $calendarURL;
     private $cinemaURL;

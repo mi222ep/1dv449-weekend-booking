@@ -29,8 +29,8 @@ class daysToParty{
             $movieHour = substr($movies["tid"], 0, 2);
             foreach($this->barTableTimes as $time){
                 if(substr($time, 0, 2) - $movieHour == 2){
-                    $plans[] = new confirmedPlan($this->nameOfDay,$movies["tid"], $movies['film']);
-                    //$plans[] = array("day"=>$this->nameOfDay, "movie"=>$movies['film'], "time"=>$movies["tid"]);
+                    $confirmed = new confirmedPlan($this->nameOfDay,$movies["tid"], $movies['film']);
+                    array_push($plans, $confirmed);
                 }
             }
         }

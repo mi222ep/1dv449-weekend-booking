@@ -10,4 +10,7 @@ class confirmedPlan{
         $this->time = $time;
         $this->movie = $movie;
     }
+    public function getDay(){
+        return $this->day;
+    }
 }

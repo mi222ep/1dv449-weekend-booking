@@ -9,10 +9,13 @@ class plannerView{
     }
     public function renderNewPlans($plans){
         $this->renderHeader();
-        var_dump($plans);
         foreach($plans as $plan){
-            $plan->day;
-            echo "<br>";
+            foreach($plan as $p){
+                echo $p->day;
+                echo $p->time;
+                echo $p->movie;
+                echo "<br>";
+            }
         }
         $this->renderFooter();
     }

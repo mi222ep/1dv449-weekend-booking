@@ -14,15 +14,14 @@ class masterScraper{
         $this->wo = new \model\weekendOrganizer();
         $this->view = new plannerView();
     }
-    //Scrapes main page for URLs, set URLs in wo class
     public function scrapePage(){
         if($this->view->isAdressedTyped()){
             $this->url = $this->view->getURL();
-            $curl_scraped_page = $this->curl($this->url);
-            $curl_scraped_page = $this->findURLs($curl_scraped_page);
+            $mainPage = $this->curl($this->url);
+            $mainPage = $this->findURLs($mainPage);
 
             //Checks found links for key words and sets URLs in wo class
-            foreach($curl_scraped_page as $page) {
+            foreach($mainPage as $page) {
                 $newpage = $this->url . $page;
                 if (strpos($page, 'calendar') !== false) {
                     $this->wo->setCalendarURL($newpage);
@@ -34,7 +33,8 @@ class masterScraper{
                     $this->wo->setRestaurantURL($newpage);
                 }
             }
-            foreach($curl_scraped_page as $page) {
+            //Save url to pages
+            foreach($mainPage as $page) {
                 $newpage = $this->url . $page;
                 if (strpos($page, 'calendar') !== false) {
                     $this->wo->setCalendarURL($newpage);
@@ -54,10 +54,12 @@ class masterScraper{
 
 
     }
+    // Finds url's in string. Returns array of url's
     function findURLs($data){
         preg_match_all("/<a href=\"([^\"]*)\">(.*)<\/a>/iU",$data, $matches);
         return $matches[1];
     }
+    //retrieves a page. Return string of page
     function curl($url){
         $options = Array(
             CURLOPT_RETURNTRANSFER => TRUE,  // Setting cURL's option to return the webpage data
@@ -66,16 +68,17 @@ class masterScraper{
             CURLOPT_CONNECTTIMEOUT => 120,   // Setting the amount of time (in seconds) before the request times out
             CURLOPT_TIMEOUT => 120,  // Setting the maximum amount of time for cURL to execute queries
             CURLOPT_MAXREDIRS => 10, // Setting the maximum number of redirections to follow
-            CURLOPT_USERAGENT => "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.1a2pre) Gecko/2008073000 Shredder/3.0a2pre ThunderBrowse/3.2.1.8",  // Setting the useragent
+            //CURLOPT_USERAGENT => "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.1a2pre) Gecko/2008073000 Shredder/3.0a2pre ThunderBrowse/3.2.1.8",  // Setting the useragent
             CURLOPT_URL => $url, // Setting cURL's URL option with the $url variable passed into the function
         );
 
-        $ch = curl_init();  // Initialising cURL
-        curl_setopt_array($ch, $options);   // Setting cURL's options using the previously assigned array data in $options
-        $data = curl_exec($ch); // Executing the cURL request and assigning the returned data to the $data variable
-        curl_close($ch);    // Closing cURL
-        return $data;   // Returning the data from the function
+        $ch = curl_init();
+        curl_setopt_array($ch, $options);
+        $data = curl_exec($ch);
+        curl_close($ch);
+        return $data;
     }
+    //Check for calendarURLs, scrapes the calendars and analyses the content
     function analyzeCalendars(){
         if($this->wo->getCalendarURL()){
             $calendarURL = $this->wo->getCalendarURL();
@@ -85,38 +88,38 @@ class masterScraper{
             foreach($calendarPages as $page){
                 $newurl = $calendarURL;
                 $newurl .= "/" .$page;
-                $test = $this->curl($newurl);
-                $test=$this->wo->getTableFromCalendar($test);
-                //$test = $this->findTable($test);
-                array_push($calendars, $test);
+                $calendarPage = $this->curl($newurl);
+                $calendarPage=$this->wo->getTableFromCalendar($calendarPage);
+                array_push($calendars, $calendarPage);
             }
             $this->wo->analyzeCalendars($calendars);
         }
     }
+    //Check for cinemaURL, scrapes the cinema and adds movies to day object
     function analyzeCinema(){
         if($this->wo->getCinemaURL()){
             $cinemaPage = $this->wo->getCinemaURL();
             $unparsedCinemaPage = $this->curl($cinemaPage);
-            $daysForMovie = $this->wo->analyzeCinema($unparsedCinemaPage);
-            foreach($daysForMovie as $key =>$value ){
+            $moviesAndDays = $this->wo->analyzeCinema($unparsedCinemaPage);
+            foreach($moviesAndDays as $key =>$value ){
                 if($value ==""){
-                    unset($daysForMovie[$key]);
+                    unset($moviesAndDays[$key]);
                 }
             }
             $latestValue=0;
             $movies = array();
             //Move movies to another array
-            foreach($daysForMovie as $key => $t){
+            foreach($moviesAndDays as $key => $t){
                 if($t > $latestValue){
                     $latestValue=$t;
                 }
                 else{
                     $latestValue = 999;
                     $movies[$key] = $t;
-                    unset($daysForMovie[$key]);
+                    unset($moviesAndDays[$key]);
                 }
             }
-            foreach($daysForMovie as $key => $day){
+            foreach($moviesAndDays as $key => $day){
                 foreach($this->wo->getDaysToGoParty() as $a){
                     if($a->getNameOfDay() == $key){
                         foreach($movies as $mKey => $mValue){
@@ -136,6 +139,7 @@ class masterScraper{
         }
 
     }
+    //Check for dinnerURL, scrapes the dinner page, analyzes and add aviable times to choosen day(s)
     function analyzeDinner(){
         if($this->wo->getRestaurantURL()){
             $restaurantpage = $this->curl($this->wo->getRestaurantURL());
@@ -146,9 +150,9 @@ class masterScraper{
             $span = $DOM->getElementsByTagName('input');
             foreach($span as $s){
                     foreach($this->wo->getDaysToGoParty() as $day){
-                        $temp = $day->getShortName();
-                        if(preg_match("/".$temp ."/", $s->getAttribute("value"))){
-                            $time = str_replace($temp, "", $s->getAttribute("value"));
+                        $shortDayName = $day->getShortName();
+                        if(preg_match("/".$shortDayName ."/", $s->getAttribute("value"))){
+                            $time = str_replace($shortDayName, "", $s->getAttribute("value"));
                             $day->addBarTableTimes($time);
                     }}
 
